@@ -64,7 +64,7 @@ brewery_types = {'micro',
                  'proprietor',
                  }
 
-dtypes = {'id': int,
+dtypes = {'id': str,
           'brewery_type': 'category',
           'state': 'category',
           'country': 'category',
