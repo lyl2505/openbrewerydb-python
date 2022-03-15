@@ -2,10 +2,9 @@ import re
 import time
 import pandas as pd
 import pytest
-import sys, os
+import sys
 from unittest import mock
 
-# sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from openbrewerydb.constants import dtypes
 from openbrewerydb.core import (_validate_state, _validate_brewery_type, _validate_postal_code,
                                 _format_request_params, _get_data, load, timer)

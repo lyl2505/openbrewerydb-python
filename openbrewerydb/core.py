@@ -1,5 +1,5 @@
 
-import sys, os
+import sys
 from contextlib import contextmanager
 from timeit import default_timer
 from itertools import count
@@ -8,7 +8,6 @@ import pandas as pd
 import requests
 from re import match
 
-# sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from .constants import base_url, states, brewery_types, dtypes
 
 
@@ -76,7 +75,7 @@ def timer(verbose=False):
         sys.stdout.flush()
 
 
-def load(state=None, city=None, brewery_type=None, postal_code=None, verbose=False):
+def load(state=None, city=None, brewery_type=None, postal_code=None, verbose=False, file_output=None):
     """ Query the Open Brewery DB
 
     Parameters
@@ -95,6 +94,8 @@ def load(state=None, city=None, brewery_type=None, postal_code=None, verbose=Fal
         Postal code to select (default is ``None``, all postal codes will be included).
     verbose : bool, optional
         Option for verbose output (default is ``False``).
+    file_output : bool, optional
+        Option for output to a csv file (default is ``False``).
 
         .. versionadded:: 0.1.1
 
@@ -131,6 +132,9 @@ def load(state=None, city=None, brewery_type=None, postal_code=None, verbose=Fal
                 msg = f'\rLoaded data for {num_breweries} breweries'
                 sys.stdout.write(msg)
                 sys.stdout.flush()
+
+            if file_output is not None:
+                df.to_csv(f'{file_output}.csv', index=False)
 
             data.append(df)
 
