@@ -2,13 +2,15 @@ import re
 import time
 import pandas as pd
 import pytest
+import sys, os
 from unittest import mock
 
+# sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from openbrewerydb.constants import dtypes
-from openbrewerydb.core import (_validate_state, _validate_brewery_type,
+from openbrewerydb.core import (_validate_state, _validate_brewery_type, _validate_postal_code,
                                 _format_request_params, _get_data, load, timer)
 
-from example_data import test_json_data
+from .example_data import test_json_data
 
 
 @pytest.mark.parametrize('state', [
@@ -51,22 +53,39 @@ def test__validate_brewery_type(brewery_type):
     assert 'Invalid brewery_type entered' in str(err.value)
 
 
-@pytest.mark.parametrize('city, state, brewery_type, page', [
-    ('portland', 'Maine', 'micro', None),
-    ('portland', 'Maine', 'micro', 7),
-    (None, 'Maine', 'micro', None),
-    ('portland', None, 'micro', None),
-    ('portland', 'Maine', None, None),
-    (None, None, None, None),
+@pytest.mark.parametrize('postal_code', [
+    '12345',
+    '12345-6789',
 ])
-def test__format_request_params(city, state, brewery_type, page):
+def test__validate_postal_code(postal_code):
+    result = _validate_postal_code(postal_code)
+    assert result is None
+
+
+def test__validate_postal_code_raises():
+    with pytest.raises(ValueError) as err:
+        _validate_postal_code('1234')
+    assert 'Invalid postal_code entered' in str(err.value)
+    
+
+@pytest.mark.parametrize('city, state, brewery_type, postal_code, page', [
+    ('portland', 'Maine', 'micro', '04103-1270', None),
+    ('portland', 'Maine', 'micro', '04103-1270', 7),
+    (None, 'Maine', 'micro', None, None),
+    ('portland', None, 'micro', None,  None),
+    ('portland', 'Maine', None, '04103-1270', None),
+    (None, None, None, None, None),
+])
+def test__format_request_params(city, state, brewery_type, postal_code, page):
     result = _format_request_params(city=city,
                                     state=state,
                                     brewery_type=brewery_type,
+                                    postal_code=postal_code,
                                     page=page)
     expected = {'by_state': state,
                 'by_city': city,
                 'by_type': brewery_type,
+                'by_postal': postal_code,
                 }
     if page is not None:
         expected['page'] = str(page)
@@ -81,7 +100,9 @@ def test__format_request_params_keys(page):
 
     expected = {'by_state',
                 'by_city',
-                'by_type'}
+                'by_type',
+                'by_postal'
+                }
     if page is not None:
         expected.update(['page', 'per_page'])
 
