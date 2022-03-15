@@ -1,5 +1,5 @@
 
-import sys
+import sys, os
 from contextlib import contextmanager
 from timeit import default_timer
 from itertools import count
@@ -8,6 +8,7 @@ import pandas as pd
 import requests
 from re import match
 
+# sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from .constants import base_url, states, brewery_types, dtypes
 
 
@@ -29,7 +30,7 @@ def _validate_brewery_type(brewery_type):
 def _validate_postal_code(postal_code):
     if postal_code is None:
         return
-    elif not match('(^\d{5}$)|(^\d{5}-\d{4}$)', postal_code):
+    elif not match('(^\\d{5}$)|(^\\d{5}-\\d{4}$)', postal_code):
         raise ValueError(f'Invalid postal_code entered, {postal_code}')
 
 
@@ -90,6 +91,8 @@ def load(state=None, city=None, brewery_type=None, postal_code=None, verbose=Fal
     brewery_type : {None, 'micro', 'regional', 'brewpub', 'large', 'planning', 'bar', 'contract', 'proprietor'}
         Brewery type to select (default is ``None``, all brewery types will be
         included).
+    postal_code : str, optional
+        Postal code to select (default is ``None``, all postal codes will be included).
     verbose : bool, optional
         Option for verbose output (default is ``False``).
 
